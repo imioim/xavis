@@ -82,6 +82,8 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:now
 .steps div{background:var(--soft);border-radius:12px;padding:16px 18px;font-size:21px;line-height:1.4;border-top:5px solid var(--blue)}
 .steps div b{display:block;color:var(--navy);font-size:20px;margin-bottom:6px}
 .big{font-size:64px;font-weight:800;color:var(--navy);line-height:1}
+.golink{display:inline-block;margin-left:18px;font-size:20px;font-weight:700;color:#fff;background:var(--blue);padding:8px 18px;border-radius:10px;text-decoration:none;vertical-align:middle;letter-spacing:0}
+.golink:hover{background:var(--navy)}.golink:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
 /* ui */
 #ui{position:fixed;left:0;right:0;bottom:0;height:46px;display:flex;align-items:center;justify-content:center;gap:12px;font-size:15px;color:var(--mut)}
 #ui button{font:inherit;min-width:44px;height:36px;border:1px solid #c9cfda;background:#fff;border-radius:8px;cursor:pointer;color:var(--ink)}
@@ -291,7 +293,7 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:now
 
 <!-- 13 -->
 <section class="slide">
-  <div class="ch">5. 진단 방법</div><h2>채점 엔진 <small>평가 틀 파일(JSON) + 채점 엔진(웹 브라우저)</small></h2>
+  <div class="ch">5. 진단 방법</div><h2>채점 엔진 <small>평가 틀 파일(JSON) + 채점 엔진(웹 브라우저)</small> <a class="golink" href="https://imioim.github.io/cae/" target="_blank" rel="noopener">경쟁력 진단 엔진 열기 ↗</a></h2>
   <div class="body">
     <div class="steps">
       <div><b>1 평가 틀 읽기</b>범주, 자료 항목, 지표, 채점 규칙</div>
@@ -542,7 +544,7 @@ const show=i=>{cur=Math.max(0,Math.min(slides.length-1,i));slides.forEach((s,k)=
   document.getElementById('bar').style.width=`${(cur+1)/slides.length*100}%`;
   try{history.replaceState(null,'',`#s${cur+1}`)}catch(e){}};
 addEventListener('resize',fit);
-addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' ','Enter'].includes(e.key)){e.preventDefault();show(cur+1)}
+addEventListener('keydown',e=>{if(e.target.closest&&e.target.closest('a,button'))return;if(['ArrowRight','PageDown',' ','Enter'].includes(e.key)){e.preventDefault();show(cur+1)}
   else if(['ArrowLeft','PageUp','Backspace'].includes(e.key)){e.preventDefault();show(cur-1)}
   else if(e.key==='Home')show(0);else if(e.key==='End')show(slides.length-1)});
 document.getElementById('prev').onclick=()=>show(cur-1);
