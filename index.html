@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>자비스 경쟁력 진단 발표</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE: 학술 발표, 차분하고 정확하게
+   IDEA: 검사 장비 화면 — 흰 바탕, 정밀한 눈금, 남색 강조
+   PICTURE: 각 장의 표·막대·점선 그래프가 그림 역할
+   COLOUR and TYPE: 남색 #1f3a8a 주색, 하늘 #2f6fd6 보조, 주황 #e4572e 강조 / Noto Sans KR
+   LAYOUT: 1600×900 고정 캔버스를 화면에 맞춰 축소, 왼쪽 정렬 제목, 아래 진행 막대 */
+:root{color-scheme:light;--ink:#14171f;--mut:#5b6270;--line:#e3e6ec;--soft:#f3f5f9;--navy:#1f3a8a;--blue:#2f6fd6;--sky:#dbe7fb;--acc:#e4572e;--gray:#b9b6ad;--bg:#e9ecf2}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;height:100%;background:var(--bg);font-family:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;color:var(--ink);overflow:hidden}
+#stage{position:fixed;inset:0;display:grid;place-items:center}
+#deck{width:1600px;height:900px;position:relative;transform-origin:center center}
+.slide{position:absolute;inset:0;background:#fff;border-radius:18px;box-shadow:0 20px 60px rgba(20,30,60,.18);padding:70px 90px 80px;display:none;flex-direction:column;overflow:hidden}
+.slide.on{display:flex}
+.slide::before{content:"";position:absolute;left:0;top:0;bottom:0;width:10px;background:var(--navy)}
+.ch{font-size:19px;font-weight:700;color:var(--blue);margin-bottom:10px}
+h2{font-size:46px;line-height:1.15;margin:0 0 30px;font-weight:800;letter-spacing:-.02em}
+h2 small{font-size:24px;font-weight:500;color:var(--mut);margin-left:14px;letter-spacing:0}
+.body{flex:1;display:flex;flex-direction:column;gap:18px;font-size:25px;line-height:1.55}
+ul{margin:0;padding-left:1.1em}li{margin:6px 0}li::marker{color:var(--blue)}
+ol{margin:0;padding-left:1.3em}ol li::marker{color:var(--blue);font-weight:700}
+b,strong{font-weight:700}
+.k{color:var(--navy);font-weight:700}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:44px;flex:1}
+.cols.c64{grid-template-columns:1.25fr 1fr}
+.card{background:var(--soft);border-radius:14px;padding:22px 26px}
+.card h3{margin:0 0 8px;font-size:24px;color:var(--navy)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.note{font-size:18px;color:var(--mut)}
+.tag{display:inline-block;font-size:17px;font-weight:700;background:var(--sky);color:var(--navy);border-radius:999px;padding:3px 14px;margin-right:8px;vertical-align:middle}
+.tag.out{background:#fde7e0;color:#b5462f}
+table{border-collapse:collapse;width:100%;font-size:22px;line-height:1.45}
+th{background:var(--navy);color:#fff;font-weight:700;text-align:left;padding:10px 14px}
+td{border-bottom:1px solid var(--line);padding:12px 14px;vertical-align:top}
+table.tight td{padding:7px 14px}table.tight th{padding:8px 14px}
+tr.hl td{background:#fff6e5}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.foot{position:absolute;left:90px;right:90px;bottom:26px;display:flex;justify-content:space-between;font-size:15px;color:var(--mut)}
+/* cover */
+.cover{background:linear-gradient(135deg,#14275f 0%,#1f3a8a 55%,#2f6fd6 100%);color:#fff;justify-content:center}
+.cover::before{display:none}
+.cover .ch{color:#bcd2ff;font-size:24px}
+.cover h1{font-size:76px;line-height:1.1;margin:10px 0 24px;font-weight:800;letter-spacing:-.02em}
+.cover .sub{font-size:32px;color:#e5ecff}
+.cover .who{margin-top:70px;font-size:24px;color:#cfdcff}
+.cover svg{position:absolute;right:70px;top:150px;opacity:.9}
+/* charts */
+.bars{display:flex;align-items:flex-end;gap:42px;height:400px;padding:0 10px;border-bottom:2px solid var(--line)}
+.bars .g{flex:1;display:flex;align-items:flex-end;justify-content:center;gap:8px;height:100%;position:relative}
+.bars .b{width:44px;border-radius:6px 6px 0 0;position:relative}
+.bars .b span{position:absolute;top:-28px;left:50%;transform:translateX(-50%);font-size:18px;font-weight:700;color:var(--ink)}
+.bars .lab{position:absolute;bottom:-38px;left:0;right:0;text-align:center;font-size:19px;color:var(--mut)}
+.legend{display:flex;gap:22px;font-size:18px;color:var(--mut);margin-top:52px}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.hb{display:grid;grid-template-columns:270px 1fr 40px;align-items:center;gap:14px;font-size:20px;margin:9px 0}
+.hb .tr{height:22px;background:var(--soft);border-radius:4px;position:relative}
+.hb .f{height:100%;border-radius:4px}
+.hb .v{font-weight:700;text-align:right}
+.ax{display:grid;grid-template-columns:270px 1fr 40px;gap:14px;font-size:16px;color:var(--mut)}
+.ax div:nth-child(2){display:flex;justify-content:space-between}
+.db{display:grid;grid-template-columns:270px 1fr 50px;align-items:center;gap:16px;font-size:21px;height:48px}
+.db .tr{position:relative;height:100%}
+.db .ln{position:absolute;top:50%;height:6px;margin-top:-3px;background:#a9c6f2;border-radius:3px}
+.db .p{position:absolute;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;border:2px solid #fff}
+.db .gl{position:absolute;top:0;bottom:0;width:1px;background:var(--line)}
+.db .d{color:var(--blue);font-weight:700;font-size:18px}
+.grp{font-size:19px;font-weight:700;color:var(--blue);margin:10px 0 2px}
+.kpi{display:flex;gap:16px}
+.kpi div{background:var(--soft);border-radius:12px;padding:12px 22px;text-align:center}
+.kpi small{display:block;font-size:16px;color:var(--mut)}
+.kpi b{font-size:36px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.steps div{background:var(--soft);border-radius:12px;padding:16px 18px;font-size:21px;line-height:1.4;border-top:5px solid var(--blue)}
+.steps div b{display:block;color:var(--navy);font-size:20px;margin-bottom:6px}
+.big{font-size:64px;font-weight:800;color:var(--navy);line-height:1}
+/* ui */
+#ui{position:fixed;left:0;right:0;bottom:0;height:46px;display:flex;align-items:center;justify-content:center;gap:12px;font-size:15px;color:var(--mut)}
+#ui button{font:inherit;min-width:44px;height:36px;border:1px solid #c9cfda;background:#fff;border-radius:8px;cursor:pointer;color:var(--ink)}
+#ui button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+#bar{position:fixed;left:0;top:0;height:4px;background:var(--blue);transition:width .25s}
+@media (prefers-reduced-motion:reduce){#bar{transition:none}}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div id="stage"><div id="deck">
+
+<!-- 1 -->
+<section class="slide cover">
+  <div class="ch">산업융합 선도기업 사례연구</div>
+  <h1>경쟁력 진단과<br>강화 방안</h1>
+  <div class="sub">㈜자비스 삼차원 엑스선 단층촬영 자동검사 시스템</div>
+  <div class="who">임정혁 · 과학기술정책학과 박사과정 202625303</div>
+  <svg width="420" height="420" viewBox="0 0 420 420" aria-hidden="true">
+    <circle cx="210" cy="210" r="190" fill="none" stroke="#ffffff" stroke-opacity=".25" stroke-width="2"/>
+    <circle cx="210" cy="210" r="140" fill="none" stroke="#ffffff" stroke-opacity=".35" stroke-width="2" stroke-dasharray="6 8"/>
+    <g transform="translate(150 120)"><rect width="120" height="180" rx="22" fill="#ffffff" fill-opacity=".14" stroke="#fff" stroke-opacity=".7" stroke-width="3"/>
+    <rect x="40" y="-14" width="40" height="16" rx="5" fill="#fff" fill-opacity=".7"/>
+    <g stroke="#bcd2ff" stroke-width="3" opacity=".9"><line x1="20" y1="30" x2="20" y2="150"/><line x1="40" y1="30" x2="40" y2="150"/><line x1="60" y1="30" x2="60" y2="150"/><line x1="80" y1="30" x2="80" y2="150"/><line x1="100" y1="30" x2="100" y2="150"/></g></g>
+    <line x1="20" y1="210" x2="400" y2="210" stroke="#ffd27a" stroke-width="3" stroke-dasharray="2 10"/>
+    <circle cx="210" cy="210" r="8" fill="#ffd27a"/>
+  </svg>
+</section>
+
+<!-- 2 -->
+<section class="slide">
+  <div class="ch">Contents</div><h2>목차</h2>
+  <div class="body"><div class="grid2" style="font-size:27px">
+    <ol><li>연구 개요</li><li>기업과 품목</li><li>품목의 산업융합 특성</li><li>시장과 제도 환경</li><li>진단 방법</li></ol>
+    <ol start="6"><li>진단 결과</li><li>기업 여건</li><li>핵심 과제와 경쟁력 강화 방안</li><li>정책·지원 방안</li><li>결론과 한계</li></ol>
+  </div></div>
+</section>
+
+<!-- 3 -->
+<section class="slide">
+  <div class="ch">1. 연구 개요</div><h2>연구 개요</h2>
+  <div class="body"><div class="grid2">
+    <div class="card"><h3>목적</h3>2023년 지정 이듬해인 2025년, 2차전지 검사장비 매출이 186억 원에서 26억 원으로 줄고 영업손실로 전환. 지정 품목의 기술·시장·제도·데이터 여건을 진단해 핵심 과제를 찾고 기업 전략과 정책·지원 방안 제시</div>
+    <div class="card"><h3>범위</h3>2차전지용 3D CT 자동검사 시스템과 차세대 형태(46파이 원통형, 전고체 배터리 검사). 재무·연구개발·사업 구성은 점수에서 빼고 '기업 여건'으로 정리</div>
+    <div class="card"><h3>방법</h3>4개 범주 13개 지표, 단계 기준(1~5점) 절대평가, 핵심 과제 도출, 2028년 말 목표 점수 설정</div>
+    <div class="card"><h3>자료</h3>2025 사업보고서, 2026 반기보고서, KIPRIS 특허 77건, 거래소 공시, 언론 보도, 논문, 정부 사업 공고. 자료 기준일 2026.10.17</div>
+  </div></div>
+</section>
+
+<!-- 4 -->
+<section class="slide">
+  <div class="ch">2. 기업과 품목</div><h2>기업 개요와 사업 구성의 변화</h2>
+  <div class="body"><div class="cols c64">
+    <div><ul style="font-size:22px">
+      <li>2002년 설립, 2015년 코넥스, 2019년 코스닥 기술성장기업 특례 상장. 본사 경기 성남, 연구개발 인력 87명</li>
+      <li>Xscan(2차전지, PCB·반도체), Fscan(식품 이물)</li>
+      <li>국내 배터리 3사 고객. 2024년 2천만불 수출의 탑</li>
+      <li>2024년 2차전지가 제품매출의 56.1%(186억 원) → 2025년 북미 대형 수주 인식 종료로 26.4억 원</li>
+      <li><span class="k">2026년 상반기 24.9억 원으로 이미 2025년 연간 수준.</span> 하반기도 같다면 연간 약 50억 원이지만 2024년의 3분의 1에 못 미침</li>
+    </ul></div>
+    <div>
+      <div class="note" style="margin-bottom:34px">제품군별 매출 (별도, 억 원)</div>
+      <div class="bars" id="salesChart"></div>
+      <div class="legend"><span><i style="background:var(--navy)"></i>2차전지</span><span><i style="background:#8fb0e8"></i>PCB·반도체</span><span><i style="background:var(--gray)"></i>식품</span></div>
+      <div class="note" style="margin-top:10px">출처: 2025 사업보고서 p.15, 2026 반기보고서 p.15, KOSDAQ Connect 2025 IR 자료</div>
+    </div>
+  </div></div>
+</section>
+
+<!-- 5 -->
+<section class="slide">
+  <div class="ch">2. 기업과 품목</div><h2>선도기업 지정 품목 <small>2023년 산업통상자원부 지정</small></h2>
+  <div class="body">
+    <div class="card" style="font-size:27px">배터리 셀을 회전시키며 여러 각도에서 촬영한 투과 영상을 <span class="k">3차원으로 재구성</span>하는 인라인 전수검사 장비</div>
+    <div class="grid3">
+      <div class="card"><h3>판정 대상</h3>전극 정렬(오버행), 극판 휨·말림, 이물 같은 내부 결함 자동 판정</div>
+      <div class="card"><h3>검사 속도</h3><div class="big">400</div>원통형 셀 기준 분당 최대 검사 수</div>
+      <div class="card"><h3>수주 실적</h3>파우치·각형·원통형 세 셀 형태 모두 인라인 장비 수주</div>
+    </div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section class="slide">
+  <div class="ch">3. 품목의 산업융합 특성</div><h2>결합된 기술</h2>
+  <div class="body">
+    <div class="grid2" style="grid-template-columns:repeat(4,1fr)">
+      <div class="card"><h3>방사선</h3>엑스선 튜브와 검출기로 투과 영상 획득</div>
+      <div class="card"><h3>단층촬영</h3>여러 각도의 영상을 3차원으로 재구성</div>
+      <div class="card"><h3>컴퓨터 비전·AI</h3>극판 위치 측정, 결함 판정</div>
+      <div class="card"><h3>공장자동화</h3>라인 속도에 맞춰 셀 이송·정렬·배출</div>
+    </div>
+    <ul>
+      <li>하드웨어 성능의 업체 간 차이가 줄어, <span class="k">엑스선 하드웨어에 AI 영상 소프트웨어를 결합한 부분</span>이 경쟁력의 중심</li>
+      <li>AI 화질 복원: 빠르게 찍은 영상과 느리게 찍은 영상을 쌍으로 학습. 약 800만 장 학습(서울대·카이스트), 검사 속도 약 3배</li>
+      <li>AI 관련 국내 등록 특허 6건('딥러닝 기반 고화질 엑스레이 영상 생성 방법' 등)</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="slide">
+  <div class="ch">3. 품목의 산업융합 특성</div><h2>배터리 검사 방식의 변화</h2>
+  <div class="body">
+    <table>
+      <tr><th style="width:150px">단계</th><th>검사 방식</th><th>컴퓨터 비전의 역할</th><th>한계</th></tr>
+      <tr><td>1</td><td>전기 특성 전수 측정 + 샘플 단면 검사</td><td>없음</td><td>내부 결함을 표본으로만 확인</td></tr>
+      <tr><td>2</td><td>2D 엑스선 전수검사, 규칙 기반</td><td>극판 끝 위치 측정</td><td>모양이 일정하지 않은 결함은 규칙으로 정의 어려움</td></tr>
+      <tr><td>3</td><td>딥러닝 판정 결합</td><td>결함 판정, 이상 탐지</td><td>불량 영상 부족, 라벨링 부담</td></tr>
+      <tr><td>4</td><td>AI 화질 복원</td><td>저화질 영상을 선명하게 생성</td><td>복원 중 실제 이물이 지워질 위험</td></tr>
+      <tr class="hl"><td><b>5</b></td><td><b>3D CT 인라인 전수검사</b></td><td>3차원 재구성·판정을 셀당 수 초 안에</td><td>2D의 약 3배 가격, 일부 공정에만 도입</td></tr>
+      <tr><td>6 (진행 중)</td><td>AI 재구성, 장비 자동화</td><td>재구성 잡음 제거, 촬영 조건 자동 최적화</td><td>개발 단계</td></tr>
+    </table>
+    <ul style="font-size:21px">
+      <li>지정 품목은 5단계. 회사가 내세우는 AI는 4단계 화질 복원과 6단계 촬영 조건 자동화(2026 경기도 피지컬 AI 컨설팅 사업)</li>
+      <li>판정 성능은 IR 자료에 <span class="k">오검출 0.025%, 미검출 0.0%</span>로 제시. 선행 배터리 연구 과제의 2D/3D 하이브리드 검사기술 성과이며, 판정 모델 구조·결함 유형별 성능·시험 조건은 비공개</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 8 -->
+<section class="slide">
+  <div class="ch">4. 시장과 제도 환경</div><h2>3D CT 전수검사의 도입</h2>
+  <div class="body">
+    <div class="grid3">
+      <div class="card"><h3>해외 장비 (2023)</h3><div class="big">7분</div>셀 하나 검사 시간</div>
+      <div class="card"><h3>공장 생산 속도</h3><div class="big">15개+</div>1분당 셀 생산</div>
+      <div class="card"><h3>국내 장비</h3><div class="big">2~4초</div>셀당 검사, 양산 라인 전수검사 가능</div>
+    </div>
+    <ul>
+      <li>여러 셀 동시 촬영, 검사 헤드 증설, AI 판정으로 검사 시간 단축</li>
+      <li>2021년 GM 볼트 EV 리콜(비용 19억 달러)과 전기차 화재 이후 전극 정렬 단계 3D 전수검사 수요 증가</li>
+      <li>CT 가격이 2D의 약 3배여서 전극 정렬 같은 꼭 필요한 공정에만 CT, 이물·간극 검사는 2D 유지</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 9 -->
+<section class="slide">
+  <div class="ch">4. 시장과 제도 환경</div><h2>경쟁 구도</h2>
+  <div class="body">
+    <table>
+      <tr><th style="width:110px">구분</th><th style="width:300px">업체</th><th>내용</th></tr>
+      <tr><td>국내</td><td>에스에프에이, 이노메트리</td><td>2023년 기준 LG에너지솔루션은 에스에프에이, 삼성SDI는 두 업체 병행, SK온은 이노메트리</td></tr>
+      <tr class="hl"><td>국내</td><td><b>자비스</b></td><td>2025년 SK온 미국 켄터키 1공장 3D CT 전수검사 장비 공급사로 보도</td></tr>
+      <tr><td>해외</td><td>ZEISS, 니콘 등</td><td>고해상도 CT 강점. 니콘은 배터리 생산용 딥러닝 CT 재구성 제품 출시</td></tr>
+    </table>
+    <ul>
+      <li>국내 3사 공급사 자리는 에스에프에이·이노메트리가 먼저 차지, 자비스는 북미 공장으로 레퍼런스 확보</li>
+      <li>2025년 3월 미국 배터리 라인용 CT·이물 검사장비 <span class="k">77억 원 계약이 2026년 4월 해지</span></li>
+      <li>한 번 도입한 장비를 계속 쓰는 경향이 강해, 초기 공급사 자리를 놓치면 후속 라인에서도 불리</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 10 -->
+<section class="slide">
+  <div class="ch">4. 시장과 제도 환경</div><h2>차세대 배터리와 제도 환경</h2>
+  <div class="body"><div class="cols">
+    <div class="card"><h3>차세대 배터리</h3><ul style="font-size:22px">
+      <li>전고체: 삼성SDI 2027년 하반기(첫 적용처 휴머노이드 로봇), 도요타 2027~2028년, 닛산 2028년. 초기에는 로봇·드론 같은 소량 시장</li>
+      <li>나트륨이온: CATL 양산 공식화, LG에너지솔루션 2027년 양산 목표</li>
+      <li>전고체는 미세 결함 때문에 CT 검사 필수. 그러나 양산 실적이 없어 실제 불량 영상이 거의 없음</li></ul></div>
+    <div class="card"><h3>제도 환경</h3><ul style="font-size:22px">
+      <li>3D CT 전수검사를 요구하는 규정 없음, 배터리 회사 자율 판단</li>
+      <li>판정 성능을 비교하는 공인 평가 기준 미확인</li>
+      <li>전고체 검사 표준 미확립. 자비스 측 "표준을 먼저 잡는 기업이 양산 라인 전체를 가져갈 가능성"</li>
+      <li>수출: 국내 원자력안전법 설계 승인·제작 검사, 미주 NRTL·FDA, 유럽 CE</li></ul></div>
+  </div></div>
+</section>
+
+<!-- 11 -->
+<section class="slide">
+  <div class="ch">5. 진단 방법</div><h2>평가 틀: 4개 범주 13개 지표</h2>
+  <div class="body">
+    <table class="tight" style="font-size:19px">
+      <tr><th style="width:150px">범주</th><th style="width:260px">지표</th><th>질문</th><th style="width:100px">중요도</th></tr>
+      <tr><td>기술</td><td>T1 품목 기술성숙도</td><td>고객 양산 라인에 적용되는 단계인가</td><td>중간</td></tr>
+      <tr><td></td><td>T2 판정 성능 입증</td><td>판정 성능을 비교 가능한 수치로 입증하는가</td><td><b>높음</b></td></tr>
+      <tr><td></td><td>T3 품목 연구개발</td><td>품목과 차세대 형태의 연구개발이 이어지는가</td><td>중간</td></tr>
+      <tr><td></td><td>T4 지식재산</td><td>핵심 기술이 국내외 특허로 보호되는가</td><td>중간</td></tr>
+      <tr><td>시장</td><td>M1 품목 고객 기반</td><td>주요 고객 양산 라인에 폭넓게 들어갔는가</td><td><b>높음</b></td></tr>
+      <tr><td></td><td>M2 품목 적용 범위</td><td>셀 형태와 공정, 차세대 형태까지 대응하는가</td><td>중간</td></tr>
+      <tr><td></td><td>M3 품목 매출 추이</td><td>품목 매출이 유지되거나 늘고 있는가</td><td><b>높음</b></td></tr>
+      <tr><td></td><td>M4 해외 양산 레퍼런스</td><td>해외 양산 적용 지역이 충분한가</td><td>중간</td></tr>
+      <tr><td>제도</td><td>I1 표준 참여</td><td>검사 성능·방법 표준 형성에 참여하는가</td><td><b>높음</b></td></tr>
+      <tr><td></td><td>I2 시장 진입 인증</td><td>주요 해외 시장 판매 인증을 갖추었는가</td><td>중간</td></tr>
+      <tr><td>데이터·생태계</td><td>D1 학습 데이터 구조</td><td>판정 AI를 개선할 데이터를 계속 확보하는가</td><td><b>높음</b></td></tr>
+      <tr><td></td><td>D2 수요기업 공동개발</td><td>고객사와 파일럿 단계부터 함께 개발하는가</td><td><b>높음</b></td></tr>
+      <tr><td></td><td>D3 차세대 대응</td><td>다음 시장에 맞는 품목 형태를 준비하는가</td><td><b>높음</b></td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- 12 -->
+<section class="slide">
+  <div class="ch">5. 진단 방법</div><h2>절대평가와 단계 기준</h2>
+  <div class="body">
+    <div class="card" style="font-size:26px">비교 대상 기업 없이, 지표마다 <span class="k">1점과 5점 기준을 미리 정하고</span> 수집한 값을 대입</div>
+    <div class="grid2">
+      <div class="card"><h3>외부 기준을 따른 지표</h3>T1·D3: 산업핵심기술개발사업 TRL 9단계<br>T2: 상용 장비 기준 과검율·미검율 각 1% 이하</div>
+      <div class="card"><h3>사실 기준 지표</h3>등록 국가, 고객 수, 인증 종류처럼 문서로 확인되는 사실로 단계 정의. 구간 경계(예: 매출 비율 50%, 130%)는 분석자 설정</div>
+    </div>
+    <ul><li>범주마다 성격이 달라 총점은 내지 않음</li></ul>
+  </div>
+</section>
+
+<!-- 13 -->
+<section class="slide">
+  <div class="ch">5. 진단 방법</div><h2>채점 엔진 <small>평가 틀 파일(JSON) + 채점 엔진(웹 브라우저)</small></h2>
+  <div class="body">
+    <div class="steps">
+      <div><b>1 평가 틀 읽기</b>범주, 자료 항목, 지표, 채점 규칙</div>
+      <div><b>2 입력값 정리</b>자료 항목 14개, 빈값은 '값 없음'</div>
+      <div><b>3 파생값 계산</b>M3 매출 비율 26.4÷186.0×100=14.2%</div>
+      <div><b>4 지표별 채점</b>규칙 적용, 값 없으면 '확인 불가'</div>
+      <div><b>5 평가자 확정</b>점수 수정 시 사유 기록</div>
+      <div><b>6 과제 후보</b>중요도 높음·통제 가능·2점 이하</div>
+      <div><b>7 결과 출력</b>점수·근거·목표, 파일 저장</div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h3>채점 규칙</h3>구간 대입: T1·D3(TRL), M3(매출 비율), M4(해외 지역 수)<br>단계 선택: 나머지 9개 지표</div>
+      <div class="card"><h3>설계 원칙</h3>같은 입력값이면 항상 같은 점수. 판단이 들어가는 곳(입력값 결정, 점수 확정)에는 근거와 사유 기록. 평가 대상이 바뀌면 평가 틀 파일만 새로 작성</div>
+    </div>
+  </div>
+</section>
+
+<!-- 14 -->
+<section class="slide">
+  <div class="ch">5. 진단 방법</div><h2>채점 절차</h2>
+  <div class="body" style="font-size:27px"><ol>
+    <li>지표의 단계를 가리는 데 필요한 자료 항목 14개를 정하고 항목마다 출처 지정</li>
+    <li>공시·특허·기사에서 값을 수집하고, 기사로 추정한 값은 공시 확정치로 교체</li>
+    <li>수집한 값을 채점 엔진에 입력해 규칙(구간 대입, 단계 선택)에 따라 점수로 변환</li>
+    <li>모든 점수에 근거 문장, 출처, 기준일 연결</li>
+    <li>중요도 높음, 2점 이하, 통제 가능(부분 포함)을 모두 충족하는 지표를 핵심 과제 후보로 선정</li>
+  </ol></div>
+</section>
+
+<!-- 15 -->
+<section class="slide">
+  <div class="ch">6. 진단 결과</div><h2>진단 결과 <small>5점 3 · 4점 3 · 3점 2 · 2점 3 · 1점 2</small></h2>
+  <div class="body"><div class="cols c64">
+    <div><div class="ax"><div></div><div><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div><div></div></div><div id="scoreChart"></div></div>
+    <div><ul style="font-size:20px">
+      <li><b>T2 4점</b>: 오검출 0.025%, 미검출 0.0% 공개. 결함 유형별 수치·시험 조건·제3자 검증 없음 (IR 자료 2025.7·10, 더벨 2024.3)</li>
+      <li><b>M3 1점</b>: 186.0억 → 26.4억 원(전년의 14.2%)</li>
+      <li><b>I1 1점</b>: 검사 표준 활동 참여 기록 없음</li>
+      <li><b>D1 2점</b>: 산학 협력으로 약 800만 장, 고객 데이터 이용 구조 없음</li>
+      <li><b>D3 2점</b>: 전고체 검사 과제 2026년 4월 착수, TRL 3 수준 추정</li>
+    </ul></div>
+  </div></div>
+</section>
+
+<!-- 16 -->
+<section class="slide">
+  <div class="ch">6. 진단 결과</div><h2>범주별 해석</h2>
+  <div class="body"><div class="grid2" style="font-size:20px;line-height:1.5">
+    <div class="card"><h3>기술</h3>기술성숙도·연구개발·지식재산 5점. 판정 성능은 수치를 공개해 4점이지만 결함 유형을 구분하지 않은 단일 수치이고 시험 조건·제3자 검증이 없어 5점 미달. 전고체 과제 목표 '검출 정확도 95%'는 미검율로 읽으면 상용 기준의 다섯 배</div>
+    <div class="card"><h3>시장</h3>국내 3사 고객, 세 셀 형태 대응. 그러나 매출이 대형 수주에 좌우되고 2025년 품목 매출은 전년의 14%. 후속 미국 계약 해지. <span class="k">2026년 상반기에 2025년 연간 수준을 회복했으나 2024년과의 차이는 크고 구조는 그대로</span></div>
+    <div class="card"><h3>제도</h3>유럽·북미 인증은 갖췄지만 표준 활동 없음. 회사 스스로 표준 선점의 중요성을 밝힌 것과 비교하면 실제 활동이 뒤따르지 못함</div>
+    <div class="card"><h3>데이터·생태계</h3>학습 데이터를 산학 협력에 의존, 고객사 공장 데이터를 쓸 구조 미확인. 불량품 이미지 생성 학습데이터 특허(2023 출원) 거절. 전고체 장비는 개발 초기</div>
+  </div></div>
+</section>
+
+<!-- 17 -->
+<section class="slide">
+  <div class="ch">6. 진단 결과</div><h2>핵심 과제 후보 <small>중요도 높음 · 2점 이하 · 통제 가능</small></h2>
+  <div class="body">
+    <div class="grid2" style="grid-template-columns:repeat(4,1fr)">
+      <div class="card"><span class="tag">1점</span><h3 style="margin-top:8px">I1 표준 참여</h3></div>
+      <div class="card"><span class="tag">2점</span><h3 style="margin-top:8px">D1 학습 데이터 구조</h3></div>
+      <div class="card"><span class="tag">2점</span><h3 style="margin-top:8px">D3 차세대 대응</h3></div>
+      <div class="card"><span class="tag">1점</span><h3 style="margin-top:8px">M3 품목 매출 추이</h3><span class="note">결과 지표로 다룸</span></div>
+    </div>
+    <ul>
+      <li>M3는 전방 업황의 영향이 커서 부분 통제 → 방안의 직접 목표가 아닌 결과 지표</li>
+      <li><span class="tag out">제외</span>T2 판정 성능 입증은 4점이라 후보에서 빠짐. 그러나 공개 수치를 고객이 검증할 수 없어 5점에 못 미치고 표준 제안의 전제가 되므로 I1과 함께 전략 과제 ①에서 다룸</li>
+    </ul>
+    <div class="card" style="font-size:25px"><b>종합</b> 기술 기반은 갖추었으나, 그 기술을 <span class="k">검증 가능한 성능 지표, 표준, 데이터 체계</span>로 고객에게 입증하는 부분이 부족</div>
+  </div>
+</section>
+
+<!-- 18 -->
+<section class="slide">
+  <div class="ch">7. 기업 여건</div><h2>기업 여건 <small>점수 외, 실행 여력 판단용</small></h2>
+  <div class="body">
+    <table style="font-size:21px">
+      <tr><th style="width:230px">항목</th><th>내용</th></tr>
+      <tr><td>매출·영업손익(연결)</td><td>매출 287억 → 376.1억 → 278.95억 원(2023~2025), 영업손익 +8.4억 → +12.1억 → −39.2억 원. 2026 상반기 매출 133.5억, 영업손실 14.5억 원</td></tr>
+      <tr><td>현금흐름·차입</td><td>2026 상반기 영업활동현금흐름 −23억 원, 차입금 15억 → 65억 원, 현금성 자산 70.3억 원</td></tr>
+      <tr><td>연구개발</td><td>2025년 75.8억 원(매출 대비 27.6%, 2024년 13.9%), 2026 상반기 40.8억 원(31.0%), 인력 87명</td></tr>
+      <tr><td>수주잔고(별도)</td><td>2025년 말 157.1억 → 2026년 6월 말 137.5억 원. 4월 77억 원 계약 해지, 9월 34억 원 신규 수주</td></tr>
+      <tr><td>주요 고객 의존도</td><td>매출 10% 이상 고객: 2024 A사 26.7%, 2025 B사 10.7%, 2026 상반기 B사 14.8%</td></tr>
+      <tr><td>자본</td><td>5대 1 액면병합, 2026년 10월 21일 변경상장(상장 유지 요건 관련)</td></tr>
+    </table>
+    <div class="card" style="font-size:21px"><b>시사점</b> 자체 자금 여유는 적지만 연구개발비 27.6% 유지, 국책과제 예산(전고체 검사 자비스 몫 24.7억 원, 46파이 과제 22.5억 원) 보유 → 기존 연구 역량과 국책과제 범위 안의 방안이 우선</div>
+  </div>
+</section>
+
+<!-- 19 -->
+<section class="slide">
+  <div class="ch">7. 기업 여건</div><h2>자료 기준일(10.17) 이후 변화 <span class="tag out">보고서 외</span></h2>
+  <div class="body"><div class="grid3">
+    <div class="card"><h3>3분기 실적</h3>3분기 매출 92.26억 원(전년 동기 대비 +31.6%), 누적 영업손실 38.7억 원</div>
+    <div class="card"><h3>배터리 CT 출하</h3>회전 광학계 CT 7월 양산 출하, 8월 ESS용 각형 이물검사장비 첫 출하</div>
+    <div class="card"><h3>수주</h3>10월 파우치형 이물검사장비 10억 원, 11월 미국 전극셀 조립 자동화 35.8억 원</div>
+    <div class="card"><h3>자금</h3>운영자금 30억 원 단기 차입(10.30 공시)</div>
+    <div class="card"><h3>과제</h3>경기도 피지컬 AI 실증과제 수요기업 최종 선정(11월)</div>
+    <div class="card"><h3>진단 점수</h3>10월 17일 기준 유지</div>
+  </div></div>
+</section>
+
+<!-- 20 -->
+<section class="slide">
+  <div class="ch">8. 핵심 과제와 경쟁력 강화 방안</div><h2>진단에서 전략 과제로 <small>목표 시점 2028년 말</small></h2>
+  <div class="body">
+    <table style="font-size:21px">
+      <tr><th>진단</th><th style="width:190px">해당 지표</th><th style="width:330px">전략 과제</th><th style="width:270px">지침 예시</th></tr>
+      <tr><td>판정 성능 수치는 공개했으나 결함 유형별 수치·시험 조건·제3자 검증이 없고, 표준 활동에 참여하지 않음</td><td>T2, I1, I2</td><td><b>① 판정 성능 입증 체계와 검사 표준 선점</b></td><td>(1) 기술 고도화, (3) 제도개선</td></tr>
+      <tr><td>판정 AI 개선에 필요한 결함 데이터를 산학 협력에만 의존</td><td>D1, D2</td><td><b>② 합성 데이터와 고객사 내부 학습 체계 구축</b></td><td>(1) 기술 고도화, (4) 산업생태계</td></tr>
+      <tr><td>품목 매출 급감, 차세대 품목은 개발 초기, 장비 판매 외 매출이 약함</td><td>D3, M2, M4 (M3는 결과 지표)</td><td><b>③ 차세대 품목 선행 개발과 소프트웨어 매출 확대</b></td><td>(2) 실증·시장확산, (4) 사업모델, (5) 해외진출</td></tr>
+    </table>
+    <ul style="font-size:21px"><li>과제 후보가 아니어도 같은 방안으로 함께 개선되는 지표(T2, I2, D2, M2, M4)는 해당 전략 과제에 묶음</li></ul>
+  </div>
+</section>
+
+<!-- 21 -->
+<section class="slide">
+  <div class="ch">8. 핵심 과제와 경쟁력 강화 방안</div><h2>① 판정 성능 입증 체계와 검사 표준 선점</h2>
+  <div class="body">
+    <div class="card" style="font-size:21px"><b>배경</b> CT는 2D보다 약 3배 비싸 고객이 확인할 수 있는 수치가 있어야 도입이 넓어짐. 자비스는 오검출 0.025%, 미검출 0.0%를 제시했지만 측정 결함·조건·시료 수를 밝히지 않았고 제3자 검증도 없음. 2021·2023년 국책과제의 '오검출 감소' 결과도 결함 유형별로는 비공개</div>
+    <div class="grid3" style="font-size:21px">
+      <div class="card"><h3>측정·공개</h3>결함 유형별(오버행, 이물, 탭 결함, 극판 주름) 과검율·미검율과 셀당 검사 시간을 표준 시편으로 측정해 시험 조건과 함께 공개. 2021년 표준 검사 시편 국산화 경험 활용</div>
+      <div class="card"><h3>제3자 검증</h3>공인 시험기관 성능 시험 성적서 확보</div>
+      <div class="card"><h3>KS안 제안</h3>전고체 과제 성과로 '배터리 셀 CT 검사장비 성능 평가 방법' 제안. '검출 정확도 95%'를 결함 유형별 과검율·미검율과 검사 속도로 정의하는 것이 출발점</div>
+    </div>
+  </div>
+</section>
+
+<!-- 22 -->
+<section class="slide">
+  <div class="ch">8. 핵심 과제와 경쟁력 강화 방안</div><h2>② 합성 데이터와 고객사 내부 학습 체계 구축</h2>
+  <div class="body">
+    <div class="card" style="font-size:21px"><b>배경</b> 전고체는 양산 전이라 실제 불량 영상이 거의 없고, 리튬이온 불량 영상은 고객사가 기밀로 관리. 엑스선은 물리가 잘 정립돼 시뮬레이션이 실제에 가까움. Gao 등(2023)은 합성 영상만으로 학습한 모델이 실제 영상 학습 모델과 같은 수준의 성능을 냈다고 보고</div>
+    <ul style="font-size:22px">
+      <li>셀 설계 모델에 결함(균열, 공극, 주름, 이물)을 넣고 투과·산란·잡음을 계산하는 물리 기반 합성 데이터 생산 체계</li>
+      <li>고객사 실제 정상 영상에 합성 결함 삽입</li>
+      <li>영상을 반출하지 않고 고객사 장비 안에서 재학습하는 구조를 표준 계약 조건으로</li>
+      <li>2026년 9월 34억 원 계약 신규 고객을 두 번째 공동개발 파트너로</li>
+      <li>합성 데이터 학습 모델은 결함을 넣은 실제 시료로 검증</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 23 -->
+<section class="slide">
+  <div class="ch">8. 핵심 과제와 경쟁력 강화 방안</div><h2>③ 차세대 품목 선행 개발과 소프트웨어 매출 확대</h2>
+  <div class="body">
+    <div class="card" style="font-size:21px"><b>배경</b> 2차전지 장비 매출 186억 → 26억 원, 2026년 4월 77억 원 계약 해지. 수주 공백을 메울 매출과 다음 시장에서 먼저 공급사로 자리 잡을 품목이 함께 필요</div>
+    <div class="grid2" style="font-size:21px">
+      <div class="card"><h3>전고체</h3>2028년 말까지 수요기업 파일럿 라인 실증(TRL 6~7). 로봇·드론 같은 소량 다품종 라인용 장비 구성도 준비</div>
+      <div class="card"><h3>46파이</h3>원통형 배터리 검사시스템 과제(2027년 7월 종료)를 양산 라인 적용으로 연결</div>
+      <div class="card"><h3>소프트웨어 정기 계약</h3>이미 발생하는 SW 업그레이드 매출을 모델 정기 업데이트·결함 통계 분석·원격 유지보수 상품으로 확대(②가 기술 기반)</div>
+      <div class="card"><h3>나트륨이온</h3>셀 형태가 비슷해 기존 장비 응용 가능. ESS 시장 중심으로 적용 가능성 점검</div>
+    </div>
+  </div>
+</section>
+
+<!-- 24 -->
+<section class="slide">
+  <div class="ch">8. 핵심 과제와 경쟁력 강화 방안</div><h2>실행 우선순위 <small>7장 기업 여건 고려</small></h2>
+  <div class="body"><div class="grid3">
+    <div class="card"><div class="big">1</div><h3 style="margin-top:12px">①을 가장 먼저</h3>시편 측정과 성적서 확보는 비용이 적고 바로 영업 자료로 활용</div>
+    <div class="card"><div class="big">2</div><h3 style="margin-top:12px">②는 국책과제 안에서</h3>전고체 과제의 'AI 기반 결함 판정, 대용량 검사 데이터 처리' 범위에 포함해 추가 자금 부담 축소</div>
+    <div class="card"><div class="big">3</div><h3 style="margin-top:12px">③은 단계적으로</h3>소프트웨어 정기 계약은 기존 고객 대상 바로 시작, 전고체·46파이 장비는 과제 일정에 맞춤</div>
+  </div></div>
+</section>
+
+<!-- 25 -->
+<section class="slide">
+  <div class="ch">8. 핵심 과제와 경쟁력 강화 방안</div><h2>2028년 말 목표 점수</h2>
+  <div class="body"><div class="cols c64">
+    <div id="targetChart"></div>
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div class="kpi"><div><small>현재 평균</small><b style="color:#8f8b80">2.6</b></div><div><small>목표 평균</small><b style="color:var(--blue)">4.1</b></div><div><small>향상</small><b>+1.5</b></div></div>
+      <ul style="font-size:20px">
+        <li>T2: 결함 유형별 과검율·미검율을 각 1% 이하로 공개하면 5점</li>
+        <li>I1: KS안을 제안하면 3점</li>
+        <li>D3: 파일럿 라인 실증(TRL 6~7)이면 4점</li>
+        <li>M3는 업황 영향이 커서 목표 없이 세 과제의 결과로 확인</li>
+      </ul>
+      <div class="note">회색 점 = 현재 점수, 파란 점 = 2028년 말 목표 (평가 틀 v0.2)</div>
+    </div>
+  </div></div>
+</section>
+
+<!-- 26 -->
+<section class="slide">
+  <div class="ch">9. 정책·지원 방안</div><h2>정책·지원 방안</h2>
+  <div class="body"><div class="grid3" style="font-size:21px">
+    <div class="card"><h3>안전 기준과 내부 결함 검사 연계</h3>안전성 인증 체계에 셀 내부 결함 검사 항목과 장비 성능 요건(검출 한계, 판정 정확도) 명시 → CT 도입이 품질 요건이 되고 성능을 입증하는 업체가 유리</div>
+    <div class="card"><h3>공동 기준 시료와 공개 합성 데이터셋</h3>중소기업이 혼자 갖추기 어려운 기준 시료와 합성 데이터셋을 국책과제 산출물로 공개 → 같은 기준으로 성능 입증, 객관적 장비 비교</div>
+    <div class="card"><h3>지정 후 성과 점검</h3>우선구매·조달 가점·보증료 감면·R&D 지원은 있으나 지정 이후 성과 지표가 없음. 자비스는 지정 다음 해 품목 매출이 전년의 14%. 품목 단위 진단 지표를 지정·갱신 시점에 점검</div>
+  </div></div>
+</section>
+
+<!-- 27 -->
+<section class="slide">
+  <div class="ch">10. 결론과 한계</div><h2>결론</h2>
+  <div class="body">
+    <div class="card" style="font-size:24px">기술성숙도·연구개발·지식재산은 최고 단계, 국내 배터리 3사가 고객</div>
+    <div class="grid3" style="font-size:21px">
+      <div class="card"><h3>부족 1</h3>공개한 판정 성능 수치를 고객이 검증할 수 있는 형태로 제시하지 못함</div>
+      <div class="card"><h3>부족 2</h3>검사 표준 활동에 참여하지 않음</div>
+      <div class="card"><h3>부족 3</h3>판정 AI 학습 데이터를 산학 협력에 의존</div>
+    </div>
+    <ul style="font-size:22px">
+      <li>그 결과 품목 매출이 대형 수주에 따라 크게 흔들리고, 차세대 배터리 검사 표준을 누가 제시할지도 아직 정해지지 않음</li>
+      <li>세 전략 과제는 연결됨: 성능 지표가 있어야 표준을 제안할 수 있고, 데이터 체계가 있어야 판정 모델 개선과 소프트웨어 매출이 가능</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 28 -->
+<section class="slide">
+  <div class="ch">10. 결론과 한계</div><h2>한계와 후속 연구</h2>
+  <div class="body" style="font-size:21px">
+    <ul>
+      <li><b>공개 자료의 한계</b>: 해외 고객 양산 라인 적용 여부, 공개된 오검출·미검출 수치의 측정 결함·시험 조건과 지정 품목(3D CT 인라인 장비) 해당 여부는 확인되지 않음. 회사 확인 필요</li>
+      <li><b>단계 기준의 설정</b>: 외부 기준이 없는 지표의 구간 경계는 분석자 설정. 구간을 바꾸면 일부 점수가 달라질 수 있음</li>
+      <li><b>매출 지표의 기저효과</b>: M3는 전년 대비 비율만 보므로 급감 다음 해에는 일부 회복만으로도 높은 점수. 2026년 매출이 약 50억 원이면 5점이지만 2024년의 27% 수준. 최근 3년 최고 매출 대비 비율을 함께 보는 보완 검토</li>
+      <li><b>단일 사례</b>: 한 기업의 한 품목만 분석</li>
+    </ul>
+    <div class="card"><h3>후속 연구</h3>같은 평가 틀을 여러 지정 품목에 적용하고, 지정 전후 공공조달 실적과 기업 성과를 비지정 기업과 비교해 제도 효과 분석(제도 효과를 직접 분석한 학술 연구는 찾지 못함)</div>
+  </div>
+</section>
+
+<!-- 29 -->
+<section class="slide cover">
+  <div class="ch">산업융합 선도기업 사례연구 · ㈜자비스</div>
+  <h1>감사합니다</h1>
+  <div class="sub">질의응답</div>
+  <div class="who">임정혁 · 과학기술정책학과 박사과정 202625303</div>
+</section>
+
+</div></div>
+<div id="ui"><button id="prev" type="button" aria-label="이전 장">◀</button><span id="num">1 / 29</span><button id="next" type="button" aria-label="다음 장">▶</button><button id="fs" type="button">전체 화면</button></div>
+
+<script>
+{
+const slides=[...document.querySelectorAll('.slide')];
+const deck=document.getElementById('deck');
+let cur=0;
+const fit=()=>{const s=Math.min(innerWidth/1660,(innerHeight-50)/950);deck.style.transform=`scale(${s})`};
+const show=i=>{cur=Math.max(0,Math.min(slides.length-1,i));slides.forEach((s,k)=>s.classList.toggle('on',k===cur));
+  document.getElementById('num').textContent=`${cur+1} / ${slides.length}`;
+  document.getElementById('bar').style.width=`${(cur+1)/slides.length*100}%`;
+  try{history.replaceState(null,'',`#s${cur+1}`)}catch(e){}};
+addEventListener('resize',fit);
+addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' ','Enter'].includes(e.key)){e.preventDefault();show(cur+1)}
+  else if(['ArrowLeft','PageUp','Backspace'].includes(e.key)){e.preventDefault();show(cur-1)}
+  else if(e.key==='Home')show(0);else if(e.key==='End')show(slides.length-1)});
+document.getElementById('prev').onclick=()=>show(cur-1);
+document.getElementById('next').onclick=()=>show(cur+1);
+document.getElementById('fs').onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}catch(e){}};
+let tx=null;addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
+addEventListener('touchend',e=>{if(tx==null)return;const d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)show(cur+(d<0?1:-1));tx=null});
+
+// 4장 매출 막대
+const sales=[["2023",121,54,69],["2024",186,55,90],["2025",26,72,102],["2026 상반기",25,29,45]];
+const col=["var(--navy)","#8fb0e8","var(--gray)"];
+document.getElementById('salesChart').innerHTML=sales.map(r=>`<div class="g">${r.slice(1).map((v,i)=>`<div class="b" style="height:${v/200*100}%;background:${col[i]}"><span>${v}</span></div>`).join('')}<div class="lab">${r[0]}</div></div>`).join('');
+
+// 15장 점수 막대
+const sc=[["T1 품목 기술성숙도",5],["T2 판정 성능 입증",4],["T3 품목 연구개발",5],["T4 지식재산",5],["M1 품목 고객 기반",4],["M2 품목 적용 범위",4],["M3 품목 매출 추이",1],["M4 해외 양산 레퍼런스",2],["I1 표준 참여",1],["I2 시장 진입 인증",3],["D1 학습 데이터 구조",2],["D2 수요기업 공동개발",3],["D3 차세대 대응",2]];
+const sCol=s=>s>=4?"var(--navy)":s===3?"#8fb0e8":"var(--acc)";
+document.getElementById('scoreChart').innerHTML=sc.map(([n,s])=>`<div class="hb"><div>${n}</div><div class="tr"><div class="f" style="width:${s*20}%;background:${sCol(s)}"></div></div><div class="v">${s}</div></div>`).join('')+
+ `<div class="note" style="margin-top:10px"><i style="display:inline-block;width:12px;height:12px;background:var(--acc);border-radius:2px"></i> 2점 이하 &nbsp; <i style="display:inline-block;width:12px;height:12px;background:#8fb0e8;border-radius:2px"></i> 3점 &nbsp; <i style="display:inline-block;width:12px;height:12px;background:var(--navy);border-radius:2px"></i> 4점 이상</div>`;
+
+// 25장 목표 점수
+const tg=[["① 판정 성능 입증·표준 선점",[["T2 판정 성능 입증",4,5],["I1 표준 참여",1,3],["I2 시장 진입 인증",3,5]]],["② 합성 데이터·고객사 내부 학습",[["D1 학습 데이터 구조",2,4],["D2 수요기업 공동개발",3,4]]],["③ 차세대 품목·소프트웨어 매출",[["D3 차세대 대응",2,4],["M2 품목 적용 범위",4,5],["M4 해외 양산 레퍼런스",2,3]]]];
+const px=s=>(s-1)/4*100;
+const grid=[1,2,3,4,5].map(s=>`<div class="gl" style="left:${px(s)}%"></div>`).join('');
+document.getElementById('targetChart').innerHTML=`<div class="db" style="height:28px;font-size:16px;color:var(--mut)"><div></div><div class="tr">${[1,2,3,4,5].map(s=>`<span style="position:absolute;left:${px(s)}%;transform:translateX(-50%)">${s}</span>`).join('')}</div><div></div></div>`+
+ tg.map(([g,rows])=>`<div class="grp">${g}</div>`+rows.map(([n,c,t])=>`<div class="db"><div>${n}</div><div class="tr">${grid}<div class="ln" style="left:${px(c)}%;width:${px(t)-px(c)}%"></div><div class="p" style="left:${px(c)}%;background:var(--gray)"></div><div class="p" style="left:${px(t)}%;background:var(--blue)"></div></div><div class="d">+${t-c}</div></div>`).join('')).join('');
+
+const fromHash=()=>{const m=/^#s(\d+)$/.exec(location.hash);return m?+m[1]-1:0};
+addEventListener('hashchange',()=>{const i=fromHash();if(i!==cur)show(i)});
+fit();show(fromHash());
+}
+</script>
+</body>
+</html>
